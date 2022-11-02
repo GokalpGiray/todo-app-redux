@@ -10,6 +10,12 @@ function ContentFooter() {
 
     const activeFilter = useSelector(state => state.todos.activeFilter);
 
+    const handleClear = () => {
+		if (window.confirm("Are you sure?")) {
+			dispatch(clearCompleted());
+		}
+	};
+
     return (
         <footer className="footer">
             <span className="todo-count">
@@ -46,8 +52,8 @@ function ContentFooter() {
                 </li>
             </ul>
 
-            <button className="clear-completed" onClick={() => dispatch(clearCompleted())}>
-                Clear completed
+            <button className="clear-completed" onClick={() => handleClear()}>
+                Clear Completed
             </button>
         </footer>
     )
