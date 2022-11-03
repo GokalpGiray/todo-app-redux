@@ -2,12 +2,12 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 export const getTodosAsync = createAsyncThunk("todos/getTodosAsync/", async () => {
-    const res = await axios("http://localhost:7000/todos");
+    const res = await axios(`${process.env.REACT_APP_API_BASE_ENDPOINT}/todos`);
     return res.data;
 });
 
 export const addTodoAsync = createAsyncThunk("todos/addTodoAsync/", async (data) => {
-    const res = await axios.post("http://localhost:7000/todos", data);
+    const res = await axios.post(`${process.env.REACT_APP_API_BASE_ENDPOINT}/todos`, data);
     return res.data;
 });
 
