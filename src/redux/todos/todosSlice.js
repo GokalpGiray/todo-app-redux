@@ -1,8 +1,13 @@
-import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 export const getTodosAsync = createAsyncThunk("todos/getTodosAsync/", async () => {
     const res = await axios("http://localhost:7000/todos");
+    return res.data;
+});
+
+export const addTodoAsync = createAsyncThunk("todos/addTodoAsync/", async (data) => {
+    const res = await axios.post("http://localhost:7000/todos", data);
     return res.data;
 });
 
@@ -13,22 +18,10 @@ export const todosSlice = createSlice({
         isLoading: false,
         error: null,
         activeFilter: "all",
+        addNewTodoIsLoading: false,
+        addNewTodoError: null,
     },
     reducers: {
-        addTodo: {
-            reducer: (state, action) => {
-                state.items.push(action.payload);
-            },
-            prepare: ({ title }) => {
-                return {
-                    payload: {
-                        id: nanoid(),
-                        completed: false,
-                        title,
-                    }
-                }
-            },
-        },
         toggle: (state, action) => {
             const { id } = action.payload;
 
@@ -50,6 +43,7 @@ export const todosSlice = createSlice({
         },
     },
     extraReducers: {
+        //get todos
         [getTodosAsync.pending]: (state, action) => {
             state.isLoading = true;
         },
@@ -60,7 +54,20 @@ export const todosSlice = createSlice({
         [getTodosAsync.rejected]: (state, action) => {
             state.isLoading = false;
             state.error = action.error.message;
-        }
+        },
+
+        //add todo
+        [addTodoAsync.pending]: (state, action) => {
+            state.addNewTodoIsLoading = true;
+        },
+        [addTodoAsync.fulfilled]: (state, action) => {
+            state.items.push(action.payload);
+            state.addNewTodoIsLoading = false;
+        },
+        [addTodoAsync.rejected]: (state, action) => {
+            state.addNewTodoIsLoading = false;
+            state.addNewTodoError = action.error.message;
+        },
     },
 });
 
@@ -75,5 +82,5 @@ export const selectFilteredTodos = (state) => {
     );
 };
 
-export const { addTodo, toggle, destroy, changeActiveFilter, clearCompleted } = todosSlice.actions;
+export const { toggle, destroy, changeActiveFilter, clearCompleted } = todosSlice.actions;
 export default todosSlice.reducer;
